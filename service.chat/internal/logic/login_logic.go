@@ -31,7 +31,7 @@ func NewLoginLogic(ctx context.Context, svcCtx *svc.ServiceContext) LoginLogic {
 func (l *LoginLogic) Login(req types.LoginReq) (*types.LoginResponse, error) {
 	// todo: add your logic here and delete this line
 
-	userInfo, err := l.svcCtx.UserModel.FindOneByUsername(req.Username)
+	userInfo, err := l.svcCtx.UserModel.FindOneByPhone(l.ctx, req.Username)
 
 	if err != nil {
 		return nil, err

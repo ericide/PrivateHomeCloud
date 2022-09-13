@@ -1,76 +1,37 @@
 package model
 
 import (
-	"database/sql"
+	"context"
 	"fmt"
-	"strings"
-
 	"github.com/zeromicro/go-zero/core/stores/sqlc"
 	"github.com/zeromicro/go-zero/core/stores/sqlx"
-	"github.com/zeromicro/go-zero/core/stringx"
-	"github.com/zeromicro/go-zero/tools/goctl/model/sql/builderx"
 )
 
-var (
-	userFieldNames          = builderx.RawFieldNames(&User{})
-	userRows                = strings.Join(userFieldNames, ",")
-	userRowsExpectAutoSet   = strings.Join(stringx.Remove(userFieldNames, "`create_time`", "`update_time`"), ",")
-	userRowsWithPlaceHolder = strings.Join(stringx.Remove(userFieldNames, "`id`", "`create_time`", "`update_time`"), "=?,") + "=?"
-)
+var _ UserModel = (*customUserModel)(nil)
 
 type (
+	// UserModel is an interface to be customized, add more methods here,
+	// and implement the added methods in customUserModel.
 	UserModel interface {
-		Insert(data User) (sql.Result, error)
-		FindOne(id string) (*User, error)
-		FindOneByUsername(username string) (*User, error)
-		Update(data User) error
-		Delete(id string) error
+		FindOneByPhone(ctx context.Context, username string) (*User, error)
+		userModel
 	}
 
-	defaultUserModel struct {
-		conn  sqlx.SqlConn
-		table string
-	}
-
-	User struct {
-		Id       string `db:"id"`
-		Phone    string `db:"phone"`
-		Password string `db:"password"`
-		Name     string `db:"name"`
+	customUserModel struct {
+		*defaultUserModel
 	}
 )
 
+// NewUserModel returns a model for the database table.
 func NewUserModel(conn sqlx.SqlConn) UserModel {
-	return &defaultUserModel{
-		conn:  conn,
-		table: "`user`",
+	return &customUserModel{
+		defaultUserModel: newUserModel(conn),
 	}
 }
-
-func (m *defaultUserModel) Insert(data User) (sql.Result, error) {
-	query := fmt.Sprintf("insert into %s (%s) values (?, ?, ?, ?)", m.table, userRowsExpectAutoSet)
-	ret, err := m.conn.Exec(query, data.Id, data.Phone, data.Password, data.Name)
-	return ret, err
-}
-
-func (m *defaultUserModel) FindOne(id string) (*User, error) {
-	query := fmt.Sprintf("select %s from %s where `id` = ? limit 1", userRows, m.table)
-	var resp User
-	err := m.conn.QueryRow(&resp, query, id)
-	switch err {
-	case nil:
-		return &resp, nil
-	case sqlc.ErrNotFound:
-		return nil, ErrNotFound
-	default:
-		return nil, err
-	}
-}
-
-func (m *defaultUserModel) FindOneByUsername(username string) (*User, error) {
+func (m *defaultUserModel) FindOneByPhone(ctx context.Context, username string) (*User, error) {
 	query := fmt.Sprintf("select %s from %s where `phone` = ? limit 1", userRows, m.table)
 	var resp User
-	err := m.conn.QueryRow(&resp, query, username)
+	err := m.conn.QueryRowCtx(ctx, &resp, query, username)
 
 	switch err {
 	case nil:
@@ -80,16 +41,4 @@ func (m *defaultUserModel) FindOneByUsername(username string) (*User, error) {
 	default:
 		return nil, err
 	}
-}
-
-func (m *defaultUserModel) Update(data User) error {
-	query := fmt.Sprintf("update %s set %s where `id` = ?", m.table, userRowsWithPlaceHolder)
-	_, err := m.conn.Exec(query, data.Phone, data.Password, data.Name, data.Id)
-	return err
-}
-
-func (m *defaultUserModel) Delete(id string) error {
-	query := fmt.Sprintf("delete from %s where `id` = ?", m.table)
-	_, err := m.conn.Exec(query, id)
-	return err
 }

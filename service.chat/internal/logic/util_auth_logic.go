@@ -45,7 +45,7 @@ func JwtAuth(svc *svc.ServiceContext, tokenStr string) (*types.LoginClaims, erro
 
 func JwtClaimAuth(svc *svc.ServiceContext, claim *types.LoginClaims) error {
 
-	_, err := svc.UserModel.FindOne(claim.UserId)
+	_, err := svc.UserModel.FindOne(context.Background(), claim.UserId)
 	if err != nil {
 		return errors.New("user not exist")
 	}

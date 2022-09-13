@@ -76,12 +76,19 @@ type RespConversationMessage struct {
 	CreateTime string `json:"create_time"`
 }
 
+type RespUser struct {
+	Id        string `json:"id"`
+	Name      string `json:"name"`
+	AvatarUrl string `json:"avatar_url"`
+}
+
 type RespConversation struct {
-	Id           string `json:"id"`
-	Type         string `json:"type"`
-	ChatId       string `json:"chat_id"`
-	OwnerId      string `json:"owner_id"`
-	Name         string `json:"name"`
-	LastReadTime string `json:"last_read_time"`
-	CreateTime   string `json:"create_time"`
+	Id           string   `json:"id"`
+	Type         string   `json:"type"`
+	ChatId       string   `json:"chat_id"`
+	OwnerId      string   `json:"owner_id"`
+	OppoUser     RespUser `json:"oppo_user"`
+	Name         string   `json:"name"`
+	LastReadTime string   `json:"last_read_time"`
+	CreateTime   string   `json:"create_time"`
 }

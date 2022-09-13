@@ -5,17 +5,15 @@ import (
 	"crypto/tls"
 	"encoding/json"
 	"fmt"
+	"github.com/edganiukov/apns"
 	"github.com/google/uuid"
 	"github.com/pkg/errors"
-	"io/ioutil"
-	"log"
 	"service.chat/internal/model"
 	"time"
 
 	"service.chat/internal/svc"
 	"service.chat/internal/types"
 
-	"github.com/edganiukov/apns"
 	"github.com/zeromicro/go-zero/core/logx"
 )
 
@@ -34,20 +32,21 @@ func NewNewChatMessageLogic(ctx context.Context, svcCtx *svc.ServiceContext) *Ne
 }
 
 func (l *NewChatMessageLogic) NewChatMessage(req *types.SendMessageRequest) (resp *types.Response, err error) {
-	userId, ok := l.ctx.Value("user_id").(string)
+	senderUserId, ok := l.ctx.Value("user_id").(string)
 	if !ok {
 		return nil, errors.New("user id not exist")
 	}
 
-	list, err := l.svcCtx.ConversationModel.QueryByChatId(req.ChatId)
+	plist, err := l.svcCtx.ConversationModel.QueryByChatId(l.ctx, req.ChatId)
 
-	fmt.Println("list: ", list)
+	fmt.Println("list: ", plist)
 
 	if err != nil {
+		fmt.Println("list: zheli ")
 		return nil, err
 	}
-	if len(*list) == 0 {
-		fmt.Println("errors: ", list)
+	if len(*plist) == 0 {
+		fmt.Println("errors: ", plist)
 		return nil, errors.New("chat id is invalid")
 	}
 
@@ -55,7 +54,7 @@ func (l *NewChatMessageLogic) NewChatMessage(req *types.SendMessageRequest) (res
 		Id:         uuid.New().String(),
 		ChatId:     req.ChatId,
 		Type:       req.Type,
-		SenderId:   userId,
+		SenderId:   senderUserId,
 		Content:    req.Content,
 		CreateTime: time.Now(),
 	}
@@ -71,11 +70,12 @@ func (l *NewChatMessageLogic) NewChatMessage(req *types.SendMessageRequest) (res
 		MessageCreateTime: cmItem.CreateTime,
 	}
 	pushString, _ := json.Marshal(pc)
-	for _, conItem := range *list {
+	for _, conItem := range *plist {
 		l.SendMessage(conItem.OwnerId, "", pushString)
+		if conItem.OwnerId != senderUserId {
+			go l.SendPushToClient(pc, conItem.OwnerId)
+		}
 	}
-
-	go l.SendPushToClient(cmItem.Content, "cd226ff5c9b9b72dc7347c7ea81bde081a95e91913f382dff4b1432a24fd47e0")
 
 	return &types.Response{}, nil
 }
@@ -88,30 +88,49 @@ func (l *NewChatMessageLogic) SendMessage(userId string, jwtId string, content [
 	}
 }
 
-func (l *NewChatMessageLogic) SendPushToClient(pushText string, pushToken string) {
+func (l *NewChatMessageLogic) SendPushToClient(message types.WSPushMessage, userId string) {
+	user, err := l.svcCtx.UserModel.FindOne(l.ctx, userId)
+	if err != nil {
+		return
+	}
+
+	devices, err := l.svcCtx.UserLoginRecordModel.QueryByUser(userId)
+	if err != nil {
+		return
+	}
+
+	for _, item := range devices {
+		if item.PushToken != "" {
+			l.doPush(user.Name, message.MessageContent, item.PushToken)
+		}
+	}
+
+}
+
+func (l *NewChatMessageLogic) doPush(title string, content string, pushToken string) {
 	fmt.Println("SendPushToClient")
 
-	data, err := ioutil.ReadFile(l.svcCtx.Config.Push.KEY)
-	if err != nil {
-		log.Fatal(err)
-	}
+	certificate, _ := tls.LoadX509KeyPair(l.svcCtx.Config.Push.CERT, l.svcCtx.Config.Push.KEY)
 	//l.svcCtx.Config.Push.CERT
 	c, err := apns.NewClient(
-		apns.WithCertificate(tls.Certificate{}),
+		apns.WithCertificate(certificate),
 		apns.WithBundleID("com.cabital.cabital.debug.h5.container"),
 		apns.WithMaxIdleConnections(10),
 		apns.WithTimeout(5*time.Second),
+		apns.WithEndpoint("https://api.sandbox.push.apple.com:443"),
 	)
 	if err != nil {
-		/* ... */
+		fmt.Println(err)
 	}
-	resp, err := c.Send("<device token>",
+	badge := 100
+	resp, err := c.Send(pushToken,
 		apns.Payload{
 			APS: apns.APS{
 				Alert: apns.Alert{
-					Title: "Test Push",
-					Body:  "Hi world",
+					Title: title,
+					Body:  content,
 				},
+				Badge: &badge,
 			},
 		},
 		apns.WithExpiration(10),
@@ -120,7 +139,7 @@ func (l *NewChatMessageLogic) SendPushToClient(pushText string, pushToken string
 	)
 
 	if err != nil {
-		/* ... */
+		fmt.Println(err)
 	}
-
+	fmt.Println(resp)
 }
