@@ -1,0 +1,201 @@
+
+<html>
+<haed>
+	<script
+  src="https://code.jquery.com/jquery-3.6.1.min.js"
+  integrity="sha256-o88AwQnZB+VDvE9tvIXrMQaPlFFSUTR+nldQm1LuPXQ="
+  crossorigin="anonymous"></script>
+</haed>
+<body>
+
+	<div style="display: flex;">
+		<div style="flex: 1">
+
+	<button id="button">login test</button>
+	<br>
+	<br>
+	<button id="createchannel">create channel</button>
+	<br>
+	<br>
+	<button id="sendmessage">send message</button>
+	<br>
+	<br>
+	<button id="updatetoken">update token</button>
+	<br>
+	<br>
+	<button id="getchatlist">get chat list</button>
+	<br>
+	<br>
+	<button id="getmessagelist">get message list</button>
+
+		</div>
+		<div style="flex: 1">
+			<div id="log"></div>
+<form id="form">
+    <input type="submit" value="Send" />
+    <input type="text" id="msg" size="64" autofocus />
+</form>
+		</div>
+
+	</div>
+
+	
+
+
+
+</body>
+</html>
+
+
+<script>
+
+var jwttoken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2OTg5NzEyNTcsImlhdCI6MTY2Mjk3MTI1Nywiand0X2lkIjoiNTQyODNlMmEtNGEzZi00MTFmLWI4NGMtMDY0Nzk2YTNhNDM3IiwidXNlcl9pZCI6IjcyOWE3YmM0LWJjODAtNDFkYS05ODczLWYxYzdiMmRkN2IyNSJ9.qSvsisARC91vU7DC4XmCC6QvzwiL9kiFGoqxS2XqREM"
+
+$("#button").on("click", () => {
+	$.ajax({
+		type : "POST",
+		url : "http://localhost:8888/user/login",
+		data : JSON.stringify({username: "13333333333", password: "3333333"}),
+		contentType : "application/json",
+		dataType : "json",
+		complete:function(msg) {
+			console.log(msg)
+		}
+	});
+})
+
+$("#createchannel").on("click", () => {
+	$.ajax({
+		type : "POST",
+		url : "http://localhost:8888/conversation",
+		headers: {
+            'authorization': jwttoken,
+		},
+		data : JSON.stringify({user_id: "97a97df7-0331-40c6-9480-82f1903402bf"}),
+		contentType : "application/json",
+		dataType : "json",
+		complete:function(msg) {
+			console.log(msg)
+		}
+	});
+})
+$("#sendmessage").on("click", () => {
+	$.ajax({
+		type : "POST",
+		url : "http://localhost:8888/message",
+		headers: {
+            'authorization': jwttoken,
+		},
+		data : JSON.stringify({
+			chat_id: "94432cbd-c1aa-30f2-acba-b31afd309eb3",
+			content: "first message",
+			type : "text"
+		}),
+		contentType : "application/json",
+		dataType : "json",
+		complete:function(msg) {
+			console.log(msg)
+		}
+	});
+})
+$("#updatetoken").on("click", () => {
+	$.ajax({
+		type : "PATCH",
+		url : "http://localhost:8888/pushtoken",
+		headers: {
+            'authorization': jwttoken,
+		},
+		data : JSON.stringify({
+			push_token: "fake token",
+		}),
+		contentType : "application/json",
+		dataType : "json",
+		complete:function(msg) {
+			console.log(msg)
+		}
+	});
+})
+$("#getchatlist").on("click", () => {
+	$.ajax({
+		type : "GET",
+		url : "http://localhost:8888/conversations",
+		headers: {
+            'authorization': jwttoken,
+		},
+		contentType : "application/json",
+		dataType : "json",
+		complete:function(msg) {
+			console.log(msg)
+		}
+	});
+})
+$("#getmessagelist").on("click", () => {
+	$.ajax({
+		type : "GET",
+		url : "http://localhost:8888/messages/94432cbd-c1aa-30f2-acba-b31afd309eb3",
+		headers: {
+            'authorization': jwttoken,
+		},
+		data :{
+			page: 0,
+			size: 100,
+		},
+		contentType : "application/json",
+		dataType : "json",
+		complete:function(msg) {
+			console.log(msg)
+		}
+	});
+})
+</script>
+<script type="text/javascript">
+window.onload = function () {
+    var conn;
+    var msg = document.getElementById("msg");
+    var log = document.getElementById("log");
+
+    function appendLog(item) {
+        var doScroll = log.scrollTop > log.scrollHeight - log.clientHeight - 1;
+        log.appendChild(item);
+        if (doScroll) {
+            log.scrollTop = log.scrollHeight - log.clientHeight;
+        }
+    }
+
+    document.getElementById("form").onsubmit = function () {
+        if (!conn) {
+            return false;
+        }
+        if (!msg.value) {
+            return false;
+        }
+        conn.send(msg.value);
+        msg.value = "";
+        return false;
+    };
+
+    if (window["WebSocket"]) {
+        conn = new WebSocket("ws://" + document.location.host + "/ws");
+        conn.onclose = function (evt) {
+            var item = document.createElement("div");
+            item.innerHTML = "<b>Connection closed.</b>";
+            appendLog(item);
+        };
+        conn.onopen= (evt) => {
+        	conn.send(JSON.stringify({type: "AUTH", token: jwttoken}));
+        }
+        conn.onmessage = function (evt) {
+            var messages = evt.data.split('\n');
+            for (var i = 0; i < messages.length; i++) {
+                var item = document.createElement("div");
+                item.innerText = messages[i];
+                appendLog(item);
+            }
+        };
+    } else {
+        var item = document.createElement("div");
+        item.innerHTML = "<b>Your browser does not support WebSockets.</b>";
+        appendLog(item);
+    }
+};
+</script>

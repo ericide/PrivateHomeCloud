@@ -1,0 +1,111 @@
+type (
+	NullRequest {
+	}
+
+	Request {
+		Name string `path:"name,options=you|me"`
+	}
+	IdRequest {
+		Id int64 `path:"id"`
+	}
+	Response {
+		Message string `json:"message"`
+	}
+	NormalListResponse {
+		Count int         `json:"count"`
+		Data  interface{} `json:"data"`
+	}
+
+	NormalPageRequest {
+		Page    int    `form:"page"`
+		Size    int    `form:"size"`
+		Keyword string `form:"keyword,optional"`
+	}
+
+	MessagePageRequest {
+		Page   int    `form:"page"`
+		Size   int    `form:"size"`
+		ChatId string `path:"chat_id"`
+	}
+
+	//login
+	LoginReq {
+		Username string `json:"username"`
+		Password string `json:"password"`
+	}
+
+	LoginResponse {
+		UserId       string `json:"user_id"`
+		AccessToken  string `json:"access_token"`
+		AccessExpire int64  `json:"access_expire"`
+		RefreshAfter int64  `json:"refresh_after"`
+	}
+
+	CreateChannelRequest {
+		UserId string `json:"user_id"`
+	}
+
+	UpdatePushTokenRequest {
+		PushToken string `json:"push_token"`
+	}
+
+	SendMessageRequest {
+		ChatId  string `json:"chat_id"`
+		Type    string `json:"type"`
+		Content string `json:"content"`
+	}
+
+	WSBaseReq {
+		Type string `json:"type"`
+	}
+
+	WSAuthReq {
+		Token string `json:"token"`
+	}
+
+	RespConversationMessage {
+		Id         string `json:"id"`
+		ChatId     string `json:"chat_id"`
+		Type       string `json:"type"`
+		SenderId   string `json:"sender_id"`
+		Content    string `json:"content"`
+		CreateTime string `json:"create_time"`
+	}
+
+	RespConversation {
+		Id           string `json:"id"`
+		Type         string `json:"type"`
+		ChatId       string `json:"chat_id"`
+		OwnerId      string `json:"owner_id"`
+		Name         string `json:"name"`
+		LastReadTime string `json:"last_read_time"`
+		CreateTime   string `json:"create_time"`
+	}
+)
+
+service chat-api {
+	@handler login
+	post /user/login (LoginReq) returns (LoginResponse)
+}
+
+@server(
+	jwt: Auth
+	middleware: Usercheck
+)
+
+service chat-api {
+	@handler updateToken
+	patch /pushtoken (UpdatePushTokenRequest) returns (Response)
+	
+	@handler getMessageList
+	get /messages/:chat_id (MessagePageRequest) returns (NormalListResponse)
+	
+	@handler getConversationList
+	get /conversations (NullRequest) returns (NormalListResponse)
+	
+	@handler newConversation
+	post /conversation (CreateChannelRequest) returns (Response)
+	
+	@handler newChatMessage
+	post /message (SendMessageRequest) returns (Response)
+}

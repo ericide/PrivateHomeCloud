@@ -1,0 +1,11 @@
+Name: chat-api
+Host: 0.0.0.0
+Port: 8888
+Auth:
+  AccessSecret: @ACCESS_SECRET@
+  AccessExpire: 36000000
+Mysql:
+  DataSource: @MYSQL_SERVICE@/chat?charset=utf8mb4&parseTime=true
+Push:
+  CERT: @PUSH_CERT_PATH@
+  KEY: @PUSH_KEY_PATH@
