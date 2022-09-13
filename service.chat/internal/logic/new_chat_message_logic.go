@@ -38,11 +38,9 @@ func (l *NewChatMessageLogic) NewChatMessage(req *types.SendMessageRequest) (res
 	}
 
 	plist, err := l.svcCtx.ConversationModel.QueryByChatId(l.ctx, req.ChatId)
-
-	fmt.Println("list: ", plist)
+	//fmt.Println("list: ", plist)
 
 	if err != nil {
-		fmt.Println("list: zheli ")
 		return nil, err
 	}
 	if len(*plist) == 0 {
@@ -73,7 +71,7 @@ func (l *NewChatMessageLogic) NewChatMessage(req *types.SendMessageRequest) (res
 	for _, conItem := range *plist {
 		l.SendMessage(conItem.OwnerId, "", pushString)
 		if conItem.OwnerId != senderUserId {
-			go l.SendPushToClient(pc, conItem.OwnerId)
+			go l.SendPushNotificationToClient(pc, conItem.OwnerId)
 		}
 	}
 
@@ -88,13 +86,15 @@ func (l *NewChatMessageLogic) SendMessage(userId string, jwtId string, content [
 	}
 }
 
-func (l *NewChatMessageLogic) SendPushToClient(message types.WSPushMessage, userId string) {
-	user, err := l.svcCtx.UserModel.FindOne(l.ctx, userId)
+func (l *NewChatMessageLogic) SendPushNotificationToClient(message types.WSPushMessage, userId string) {
+	user, err := l.svcCtx.UserModel.FindOne(context.Background(), userId)
+	//fmt.Println("user: ", user, userId, err)
 	if err != nil {
 		return
 	}
 
 	devices, err := l.svcCtx.UserLoginRecordModel.QueryByUser(userId)
+	//fmt.Println("devices: ", devices)
 	if err != nil {
 		return
 	}
@@ -108,7 +108,7 @@ func (l *NewChatMessageLogic) SendPushToClient(message types.WSPushMessage, user
 }
 
 func (l *NewChatMessageLogic) doPush(title string, content string, pushToken string) {
-	fmt.Println("SendPushToClient")
+	logx.Info("SendPushToClient")
 
 	certificate, _ := tls.LoadX509KeyPair(l.svcCtx.Config.Push.CERT, l.svcCtx.Config.Push.KEY)
 	//l.svcCtx.Config.Push.CERT
@@ -121,6 +121,7 @@ func (l *NewChatMessageLogic) doPush(title string, content string, pushToken str
 	)
 	if err != nil {
 		fmt.Println(err)
+		return
 	}
 	badge := 100
 	resp, err := c.Send(pushToken,
