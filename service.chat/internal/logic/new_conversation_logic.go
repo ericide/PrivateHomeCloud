@@ -36,7 +36,7 @@ func (l *NewConversationLogic) NewConversation(req *types.CreateChannelRequest) 
 
 	chatId := l.get1To1ChatId(myUserId, req.UserId)
 
-	list, err := l.svcCtx.ConversationModel.QueryByChatId(chatId)
+	list, err := l.svcCtx.ConversationModel.QueryByChatId(l.ctx, chatId)
 
 	if err != nil {
 		return nil, err
@@ -45,21 +45,23 @@ func (l *NewConversationLogic) NewConversation(req *types.CreateChannelRequest) 
 		return nil, nil
 	}
 
-	l.svcCtx.ConversationModel.Insert(model.Conversation{
+	l.svcCtx.ConversationModel.Insert(l.ctx, &model.Conversation{
 		Id:           uuid.New().String(),
 		Type:         "1",
 		ChatId:       chatId,
 		OwnerId:      myUserId,
+		OppoId:       req.UserId,
 		Name:         "",
 		LastReadTime: time.Now(),
 		CreateTime:   time.Now(),
 	})
 
-	l.svcCtx.ConversationModel.Insert(model.Conversation{
+	l.svcCtx.ConversationModel.Insert(l.ctx, &model.Conversation{
 		Id:           uuid.New().String(),
 		Type:         "1",
 		ChatId:       chatId,
 		OwnerId:      req.UserId,
+		OppoId:       myUserId,
 		Name:         "",
 		LastReadTime: time.Now(),
 		CreateTime:   time.Now(),

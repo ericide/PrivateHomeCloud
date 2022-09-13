@@ -29,18 +29,29 @@ func (l *GetConversationListLogic) GetConversationList(req *types.NullRequest) (
 		return nil, err
 	}
 
-	list, err := l.svcCtx.ConversationModel.Range(myUserId)
+	list, err := l.svcCtx.ConversationModel.QueryByUserId(l.ctx, myUserId)
 	if err != nil {
 		return nil, err
 	}
 
 	var list2 []types.RespConversation
-	for _, x := range list {
+	for _, x := range *list {
+
+		oppoUser, err := l.svcCtx.UserModel.FindOne(l.ctx, x.OppoId)
+		if err != nil {
+			return nil, err
+		}
+
 		list2 = append(list2, types.RespConversation{
-			Id:           x.Id,
-			Type:         x.Type,
-			ChatId:       x.ChatId,
-			OwnerId:      x.OwnerId,
+			Id:      x.Id,
+			Type:    x.Type,
+			ChatId:  x.ChatId,
+			OwnerId: x.OwnerId,
+			OppoUser: types.RespUser{
+				Id:        oppoUser.Id,
+				Name:      oppoUser.Name,
+				AvatarUrl: oppoUser.AvatarUrl,
+			},
 			Name:         x.Name,
 			LastReadTime: x.LastReadTime.String(),
 			CreateTime:   x.CreateTime.String(),

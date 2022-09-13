@@ -20,7 +20,7 @@ func NewUsercheckMiddleware(userModel model.UserModel, userLoginRecordModel mode
 
 func (m *UsercheckMiddleware) Handle(next http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		
+
 		userId, ok := r.Context().Value("user_id").(string)
 		if !ok {
 			w.WriteHeader(401)
@@ -35,7 +35,7 @@ func (m *UsercheckMiddleware) Handle(next http.HandlerFunc) http.HandlerFunc {
 			return
 		}
 
-		_, err := m.userModel.FindOne(userId)
+		_, err := m.userModel.FindOne(r.Context(), userId)
 		if err != nil {
 			w.WriteHeader(401)
 			w.Write([]byte(`{"message":"user not exist"}`))
