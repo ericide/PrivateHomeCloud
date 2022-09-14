@@ -8,6 +8,7 @@ import (
 	"github.com/edganiukov/apns"
 	"github.com/google/uuid"
 	"github.com/pkg/errors"
+	"service.chat/internal/defines"
 	"service.chat/internal/model"
 	"time"
 
@@ -59,52 +60,63 @@ func (l *NewChatMessageLogic) NewChatMessage(req *types.SendMessageRequest) (res
 
 	l.svcCtx.ConversationMessageModel.Insert(l.ctx, &cmItem)
 
+	l.SendWSMessage(plist, req.MessageClientId, cmItem)
+	go l.SendPushNotificationToClient(plist, cmItem)
+	return &types.Response{}, nil
+}
+
+func (l *NewChatMessageLogic) SendWSMessage(plist *[]model.Conversation, msgClientId string, cmItem model.ConversationMessage) {
+
 	pc := types.WSPushMessage{
-		Type:              "MESSAGE",
-		MessageChatId:     req.ChatId,
+		WSPushBase: types.WSPushBase{
+			Type:    defines.WSType_Message,
+			SubType: defines.WSSubType_Message,
+		},
+		ChatId:            cmItem.ChatId,
+		MessageId:         cmItem.Id,
+		MessageClientId:   msgClientId,
 		MessageType:       cmItem.Type,
 		MessageContent:    cmItem.Content,
 		MessageSenderId:   cmItem.SenderId,
 		MessageCreateTime: cmItem.CreateTime,
 	}
+
 	pushString, _ := json.Marshal(pc)
 	for _, conItem := range *plist {
-		l.SendMessage(conItem.OwnerId, "", pushString)
-		if conItem.OwnerId != senderUserId {
-			go l.SendPushNotificationToClient(pc, conItem.OwnerId)
+		l.svcCtx.ChannelChat <- &types.ChannelMessage{
+			UserId:  conItem.OwnerId,
+			JwtId:   "",
+			Content: pushString,
 		}
-	}
-
-	return &types.Response{}, nil
-}
-
-func (l *NewChatMessageLogic) SendMessage(userId string, jwtId string, content []byte) {
-	l.svcCtx.ChannelChat <- &types.ChannelMessage{
-		UserId:  userId,
-		JwtId:   jwtId,
-		Content: content,
 	}
 }
 
-func (l *NewChatMessageLogic) SendPushNotificationToClient(message types.WSPushMessage, userId string) {
-	user, err := l.svcCtx.UserModel.FindOne(context.Background(), userId)
-	//fmt.Println("user: ", user, userId, err)
-	if err != nil {
-		return
-	}
+func (l *NewChatMessageLogic) SendPushNotificationToClient(plist *[]model.Conversation, cmItem model.ConversationMessage) {
+	for _, person := range *plist {
+		if person.OwnerId == cmItem.SenderId {
+			continue
+		}
+		user, err := l.svcCtx.UserModel.FindOne(context.Background(), person.OwnerId)
+		//fmt.Println("user: ", user, userId, err)
+		if err != nil {
+			return
+		}
 
-	devices, err := l.svcCtx.UserLoginRecordModel.QueryByUser(userId)
-	//fmt.Println("devices: ", devices)
-	if err != nil {
-		return
-	}
+		devices, err := l.svcCtx.UserLoginRecordModel.QueryByUser(person.OwnerId)
+		//fmt.Println("devices: ", devices)
+		if err != nil {
+			return
+		}
 
-	for _, item := range devices {
-		if item.PushToken != "" {
-			l.doPush(user.Name, message.MessageContent, item.PushToken)
+		for _, item := range devices {
+			if item.PushToken != "" {
+				switch cmItem.Type {
+				case defines.MsgType_Text:
+					l.doPush(user.Name, cmItem.Content, item.PushToken)
+				}
+			}
 		}
 	}
-
 }
 
 func (l *NewChatMessageLogic) doPush(title string, content string, pushToken string) {
@@ -116,7 +128,7 @@ func (l *NewChatMessageLogic) doPush(title string, content string, pushToken str
 		apns.WithCertificate(certificate),
 		apns.WithBundleID("com.cabital.cabital.debug.h5.container"),
 		apns.WithMaxIdleConnections(10),
-		apns.WithTimeout(5*time.Second),
+		apns.WithTimeout(10*time.Second),
 		apns.WithEndpoint("https://api.sandbox.push.apple.com:443"),
 	)
 	if err != nil {

@@ -40,6 +40,11 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 					Handler: getConversationListHandler(serverCtx),
 				},
 				{
+					Method:  http.MethodPatch,
+					Path:    "/conversation/:chat_id/last_read_time",
+					Handler: updateLastReadTimeHandler(serverCtx),
+				},
+				{
 					Method:  http.MethodPost,
 					Path:    "/conversation",
 					Handler: newConversationHandler(serverCtx),

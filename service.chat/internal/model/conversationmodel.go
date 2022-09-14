@@ -15,6 +15,7 @@ type (
 	ConversationModel interface {
 		QueryByChatId(ctx context.Context, chatId string) (*[]Conversation, error)
 		QueryByUserId(ctx context.Context, userId string) (*[]Conversation, error)
+		QueryByChatIdUserId(ctx context.Context, chatId string, userId string) (*Conversation, error)
 		conversationModel
 	}
 
@@ -39,6 +40,21 @@ func (m *customConversationModel) QueryByChatId(ctx context.Context, chatId stri
 		return &resp, nil
 	case sqlc.ErrNotFound:
 		return &[]Conversation{}, nil
+	default:
+		return nil, err
+	}
+}
+
+func (m *customConversationModel) QueryByChatIdUserId(ctx context.Context, chatId string, userId string) (*Conversation, error) {
+	query := fmt.Sprintf("select %s from %s where `chat_id` = ? AND `owner_id` = ?", conversationRows, m.table)
+	var resp Conversation
+	err := m.conn.QueryRowCtx(ctx, &resp, query, chatId, userId)
+	fmt.Println(err)
+	switch err {
+	case nil:
+		return &resp, nil
+	case sqlc.ErrNotFound:
+		return nil, ErrNotFound
 	default:
 		return nil, err
 	}

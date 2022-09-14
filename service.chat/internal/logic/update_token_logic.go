@@ -37,5 +37,7 @@ func (l *UpdateTokenLogic) UpdateToken(req *types.UpdatePushTokenRequest) (resp 
 
 	l.svcCtx.UserLoginRecordModel.Update(l.ctx, item)
 
-	return
+	return &types.Response{
+		Message: "",
+	}, nil
 }

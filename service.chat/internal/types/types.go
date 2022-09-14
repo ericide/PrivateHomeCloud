@@ -49,14 +49,19 @@ type CreateChannelRequest struct {
 	UserId string `json:"user_id"`
 }
 
+type UpdateConversationLastReadTimeRequest struct {
+	ChatId string `path:"chat_id"`
+}
+
 type UpdatePushTokenRequest struct {
 	PushToken string `json:"push_token"`
 }
 
 type SendMessageRequest struct {
-	ChatId  string `json:"chat_id"`
-	Type    string `json:"type"`
-	Content string `json:"content"`
+	ChatId          string `json:"chat_id"`
+	MessageClientId string `json:"message_client_id"`
+	Type            string `json:"type"`
+	Content         string `json:"content"`
 }
 
 type WSBaseReq struct {
@@ -83,12 +88,14 @@ type RespUser struct {
 }
 
 type RespConversation struct {
-	Id           string   `json:"id"`
-	Type         string   `json:"type"`
-	ChatId       string   `json:"chat_id"`
-	OwnerId      string   `json:"owner_id"`
-	OppoUser     RespUser `json:"oppo_user"`
-	Name         string   `json:"name"`
-	LastReadTime string   `json:"last_read_time"`
-	CreateTime   string   `json:"create_time"`
+	Id           string                   `json:"id"`
+	Type         string                   `json:"type"`
+	ChatId       string                   `json:"chat_id"`
+	OwnerId      string                   `json:"owner_id"`
+	OppoUser     RespUser                 `json:"oppo_user"`
+	LastMessage  *RespConversationMessage `json:"last_message"`
+	UnreadCount  int                      `json:"unread_count"`
+	Name         string                   `json:"name"`
+	LastReadTime string                   `json:"last_read_time"`
+	CreateTime   string                   `json:"create_time"`
 }

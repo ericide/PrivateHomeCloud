@@ -27,7 +27,11 @@
 	<br>
 	<br>
 	<button id="getmessagelist">get message list</button>
-
+	<br>
+	<br>
+	<button id="updatereadtime">update read time</button>
+	<br>
+	<br>
 		</div>
 		<div style="flex: 1">
 			<div id="log"></div>
@@ -49,7 +53,7 @@
 
 <script>
 
-var jwttoken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2OTg5NzEyNTcsImlhdCI6MTY2Mjk3MTI1Nywiand0X2lkIjoiNTQyODNlMmEtNGEzZi00MTFmLWI4NGMtMDY0Nzk2YTNhNDM3IiwidXNlcl9pZCI6IjcyOWE3YmM0LWJjODAtNDFkYS05ODczLWYxYzdiMmRkN2IyNSJ9.qSvsisARC91vU7DC4XmCC6QvzwiL9kiFGoqxS2XqREM"
+var jwttoken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2OTkxNjc1NTcsImlhdCI6MTY2MzE2NzU1Nywiand0X2lkIjoiNmNiMTU4M2EtOGY1Ni00YzQxLTliZjQtNzZhZWI1ZmQ4ZjFlIiwidXNlcl9pZCI6Ijk3YTk3ZGY3LTAzMzEtNDBjNi05NDgwLTgyZjE5MDM0MDJiZiJ9.bxU3_2Sb4onWHMsIog-6zl_RbAFebd-4yBdrpytbmi0"
 
 $("#button").on("click", () => {
 	$.ajax({
@@ -89,7 +93,8 @@ $("#sendmessage").on("click", () => {
 		data : JSON.stringify({
 			chat_id: "94432cbd-c1aa-30f2-acba-b31afd309eb3",
 			content: "first message",
-			type : "text"
+			type : "text",
+			message_client_id: "sss"
 		}),
 		contentType : "application/json",
 		dataType : "json",
@@ -139,6 +144,24 @@ $("#getmessagelist").on("click", () => {
 		data :{
 			page: 0,
 			size: 100,
+		},
+		contentType : "application/json",
+		dataType : "json",
+		complete:function(msg) {
+			console.log(msg)
+		}
+	});
+})
+
+$("#updatereadtime").on("click", () => {
+	$.ajax({
+		type : "PATCH",
+		url : "http://localhost:8888/conversation/94432cbd-c1aa-30f2-acba-b31afd309eb3/last_read_time",
+		headers: {
+            'authorization': jwttoken,
+		},
+		data :{
+
 		},
 		contentType : "application/json",
 		dataType : "json",

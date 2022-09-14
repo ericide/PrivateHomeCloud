@@ -16,11 +16,24 @@ type ChannelMessage struct {
 	Content []byte
 }
 
+type WSPushBase struct {
+	Type    string `json:"type"`
+	SubType string `json:"sub_type"`
+}
+
 type WSPushMessage struct {
-	Type              string    `json:"user_id"`
-	MessageChatId     string    `json:"message_chat_id"`
+	WSPushBase
+	ChatId            string    `json:"chat_id"`
 	MessageType       string    `json:"message_type"`
+	MessageId         string    `json:"message_id"`
+	MessageClientId   string    `json:"message_client_id"`
 	MessageContent    string    `json:"message_content"`
 	MessageSenderId   string    `json:"message_sender_id"`
 	MessageCreateTime time.Time `json:"message_create_time"`
+}
+type WSUpdateReadTime struct {
+	WSPushBase
+	ChatId   string    `json:"chat_id"`
+	UserId   string    `json:"user_id"`
+	ReadTime time.Time `json:"read_time"`
 }
