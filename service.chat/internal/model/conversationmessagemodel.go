@@ -32,7 +32,7 @@ func NewConversationMessageModel(conn sqlx.SqlConn) ConversationMessageModel {
 }
 
 func (m *customConversationMessageModel) Range(chatId string, start int, length int) ([]*ConversationMessage, error) {
-	query := fmt.Sprintf("select %s from %s where `chat_id` = ? order by `create_time` desc limit ?, ? ", conversationMessageRows, m.table)
+	query := fmt.Sprintf("select %s from %s where `chat_id` = ? order by `send_time` desc limit ?, ? ", conversationMessageRows, m.table)
 	var resp []*ConversationMessage
 	err := m.conn.QueryRows(&resp, query, chatId, start, length)
 	switch err {
@@ -60,7 +60,7 @@ func (m *customConversationMessageModel) CountAfterTime(ctx context.Context, cha
 	}
 }
 func (m *customConversationMessageModel) LastMessage(ctx context.Context, chatId string) (*ConversationMessage, error) {
-	query := fmt.Sprintf("select %s from %s where `chat_id` = ? order by create_time desc limit 1", conversationMessageRows, m.table)
+	query := fmt.Sprintf("select %s from %s where `chat_id` = ? order by send_time desc limit 1", conversationMessageRows, m.table)
 	var resp ConversationMessage
 	err := m.conn.QueryRowCtx(ctx, &resp, query, chatId)
 	switch err {
