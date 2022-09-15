@@ -5,7 +5,7 @@ CREATE TABLE `chat`.`user_login_record`  (
                                     `device_name` char(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
                                     `push_token` char(192) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
                                     `invalid` int NOT NULL DEFAULT 0,
-                                    `end_time` timestamp(6) NOT NULL,
+                                    `end_time` bigint(20) NOT NULL DEFAULT 0,
                                     `create_time` timestamp(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
                                     PRIMARY KEY (`id`) USING BTREE
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Compact;

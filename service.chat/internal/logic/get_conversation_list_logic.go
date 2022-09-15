@@ -2,6 +2,7 @@ package logic
 
 import (
 	"context"
+	"time"
 
 	"service.chat/internal/svc"
 	"service.chat/internal/types"
@@ -57,12 +58,12 @@ func (l *GetConversationListLogic) GetConversationList(req *types.NullRequest) (
 		var lastMessageWrap *types.RespConversationMessage = nil
 		if lastMessage != nil {
 			lastMessageWrap = &types.RespConversationMessage{
-				Id:         lastMessage.Id,
-				ChatId:     lastMessage.ChatId,
-				Type:       lastMessage.Type,
-				SenderId:   lastMessage.SenderId,
-				Content:    lastMessage.Content,
-				CreateTime: lastMessage.CreateTime.String(),
+				Id:       lastMessage.Id,
+				ChatId:   lastMessage.ChatId,
+				Type:     lastMessage.Type,
+				SenderId: lastMessage.SenderId,
+				Content:  lastMessage.Content,
+				SendTime: lastMessage.SendTime,
 			}
 		}
 
@@ -75,8 +76,8 @@ func (l *GetConversationListLogic) GetConversationList(req *types.NullRequest) (
 			LastMessage:  lastMessageWrap,
 			UnreadCount:  *unreadCount,
 			Name:         x.Name,
-			LastReadTime: x.LastReadTime.Format(types.FormatISOTime),
-			CreateTime:   x.CreateTime.Format(types.FormatISOTime),
+			LastReadTime: x.LastReadTime,
+			CreateTime:   x.CreateTime.Format(time.RFC3339),
 		})
 	}
 

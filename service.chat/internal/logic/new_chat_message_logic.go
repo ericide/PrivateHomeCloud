@@ -50,12 +50,12 @@ func (l *NewChatMessageLogic) NewChatMessage(req *types.SendMessageRequest) (res
 	}
 
 	cmItem := model.ConversationMessage{
-		Id:         uuid.New().String(),
-		ChatId:     req.ChatId,
-		Type:       req.Type,
-		SenderId:   senderUserId,
-		Content:    req.Content,
-		CreateTime: time.Now(),
+		Id:       uuid.New().String(),
+		ChatId:   req.ChatId,
+		Type:     req.Type,
+		SenderId: senderUserId,
+		Content:  req.Content,
+		SendTime: time.Now().UnixMicro(),
 	}
 
 	l.svcCtx.ConversationMessageModel.Insert(l.ctx, &cmItem)
@@ -72,13 +72,13 @@ func (l *NewChatMessageLogic) SendWSMessage(plist *[]model.Conversation, msgClie
 			Type:    defines.WSType_Message,
 			SubType: defines.WSSubType_Message,
 		},
-		ChatId:            cmItem.ChatId,
-		MessageId:         cmItem.Id,
-		MessageClientId:   msgClientId,
-		MessageType:       cmItem.Type,
-		MessageContent:    cmItem.Content,
-		MessageSenderId:   cmItem.SenderId,
-		MessageCreateTime: cmItem.CreateTime.Format(types.FormatISOTime),
+		ChatId:          cmItem.ChatId,
+		MessageId:       cmItem.Id,
+		MessageClientId: msgClientId,
+		MessageType:     cmItem.Type,
+		MessageContent:  cmItem.Content,
+		MessageSenderId: cmItem.SenderId,
+		MessageSendTime: cmItem.SendTime,
 	}
 
 	pushString, _ := json.Marshal(pc)

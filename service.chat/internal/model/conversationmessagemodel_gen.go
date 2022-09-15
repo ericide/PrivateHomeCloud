@@ -7,7 +7,6 @@ import (
 	"database/sql"
 	"fmt"
 	"strings"
-	"time"
 
 	"github.com/zeromicro/go-zero/core/stores/builder"
 	"github.com/zeromicro/go-zero/core/stores/sqlc"
@@ -36,12 +35,12 @@ type (
 	}
 
 	ConversationMessage struct {
-		Id         string    `db:"id"`
-		ChatId     string    `db:"chat_id"`
-		Type       string    `db:"type"`
-		SenderId   string    `db:"sender_id"`
-		Content    string    `db:"content"`
-		CreateTime time.Time `db:"create_time"`
+		Id       string `db:"id"`
+		ChatId   string `db:"chat_id"`
+		Type     string `db:"type"`
+		SenderId string `db:"sender_id"`
+		Content  string `db:"content"`
+		SendTime int64  `db:"send_time"`
 	}
 )
 
@@ -73,14 +72,14 @@ func (m *defaultConversationMessageModel) FindOne(ctx context.Context, id string
 }
 
 func (m *defaultConversationMessageModel) Insert(ctx context.Context, data *ConversationMessage) (sql.Result, error) {
-	query := fmt.Sprintf("insert into %s (%s) values (?, ?, ?, ?, ?)", m.table, conversationMessageRowsExpectAutoSet)
-	ret, err := m.conn.ExecCtx(ctx, query, data.Id, data.ChatId, data.Type, data.SenderId, data.Content)
+	query := fmt.Sprintf("insert into %s (%s) values (?, ?, ?, ?, ?, ?)", m.table, conversationMessageRowsExpectAutoSet)
+	ret, err := m.conn.ExecCtx(ctx, query, data.Id, data.ChatId, data.Type, data.SenderId, data.Content, data.SendTime)
 	return ret, err
 }
 
 func (m *defaultConversationMessageModel) Update(ctx context.Context, data *ConversationMessage) error {
 	query := fmt.Sprintf("update %s set %s where `id` = ?", m.table, conversationMessageRowsWithPlaceHolder)
-	_, err := m.conn.ExecCtx(ctx, query, data.ChatId, data.Type, data.SenderId, data.Content, data.Id)
+	_, err := m.conn.ExecCtx(ctx, query, data.ChatId, data.Type, data.SenderId, data.Content, data.SendTime, data.Id)
 	return err
 }
 

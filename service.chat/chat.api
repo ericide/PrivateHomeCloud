@@ -60,21 +60,13 @@ type (
 		Content         string `json:"content"`
 	}
 
-	WSBaseReq {
-		Type string `json:"type"`
-	}
-
-	WSAuthReq {
-		Token string `json:"token"`
-	}
-
 	RespConversationMessage {
-		Id         string `json:"id"`
-		ChatId     string `json:"chat_id"`
-		Type       string `json:"type"`
-		SenderId   string `json:"sender_id"`
-		Content    string `json:"content"`
-		CreateTime string `json:"create_time"`
+		Id       string `json:"id"`
+		ChatId   string `json:"chat_id"`
+		Type     string `json:"type"`
+		SenderId string `json:"sender_id"`
+		Content  string `json:"content"`
+		SendTime int64  `json:"send_time"`
 	}
 
 	RespUser {
@@ -92,7 +84,7 @@ type (
 		LastMessage  *RespConversationMessage `json:"last_message"`
 		UnreadCount  int                      `json:"unread_count"`
 		Name         string                   `json:"name"`
-		LastReadTime string                   `json:"last_read_time"`
+		LastReadTime int64                    `json:"last_read_time"`
 		CreateTime   string                   `json:"create_time"`
 	}
 )

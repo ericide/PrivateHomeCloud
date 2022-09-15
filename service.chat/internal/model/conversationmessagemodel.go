@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"github.com/zeromicro/go-zero/core/stores/sqlc"
 	"github.com/zeromicro/go-zero/core/stores/sqlx"
-	"time"
 )
 
 var _ ConversationMessageModel = (*customConversationMessageModel)(nil)
@@ -15,7 +14,7 @@ type (
 	// and implement the added methods in customConversationMessageModel.
 	ConversationMessageModel interface {
 		Range(chatId string, start int, length int) ([]*ConversationMessage, error)
-		CountAfterTime(ctx context.Context, chatId string, time time.Time) (*int, error)
+		CountAfterTime(ctx context.Context, chatId string, time int64) (*int, error)
 		LastMessage(ctx context.Context, chatId string) (*ConversationMessage, error)
 		conversationMessageModel
 	}
@@ -46,8 +45,8 @@ func (m *customConversationMessageModel) Range(chatId string, start int, length 
 	}
 }
 
-func (m *customConversationMessageModel) CountAfterTime(ctx context.Context, chatId string, time time.Time) (*int, error) {
-	query := fmt.Sprintf("select Count(*) from %s where `chat_id` = ? AND `create_time` > ?", m.table)
+func (m *customConversationMessageModel) CountAfterTime(ctx context.Context, chatId string, time int64) (*int, error) {
+	query := fmt.Sprintf("select Count(*) from %s where `chat_id` = ? AND `send_time` > ?", m.table)
 	var count int
 	err := m.conn.QueryRowCtx(ctx, &count, query, chatId, time)
 	switch err {

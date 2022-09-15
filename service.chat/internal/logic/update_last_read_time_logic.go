@@ -40,7 +40,7 @@ func (l *UpdateLastReadTimeLogic) UpdateLastReadTime(req *types.UpdateConversati
 		return nil, err
 	}
 
-	cst.LastReadTime = time.Now()
+	cst.LastReadTime = time.Now().UnixMicro()
 
 	l.svcCtx.ConversationModel.Update(l.ctx, cst)
 
@@ -65,7 +65,7 @@ func (l *UpdateLastReadTimeLogic) SendWSMessage(cstItem *model.Conversation) {
 		},
 		ChatId:   cstItem.ChatId,
 		UserId:   cstItem.OwnerId,
-		ReadTime: cstItem.LastReadTime.Format(types.FormatISOTime),
+		ReadTime: cstItem.LastReadTime,
 	}
 
 	pushString, _ := json.Marshal(pc)

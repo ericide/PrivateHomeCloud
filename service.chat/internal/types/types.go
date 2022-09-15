@@ -64,21 +64,13 @@ type SendMessageRequest struct {
 	Content         string `json:"content"`
 }
 
-type WSBaseReq struct {
-	Type string `json:"type"`
-}
-
-type WSAuthReq struct {
-	Token string `json:"token"`
-}
-
 type RespConversationMessage struct {
-	Id         string `json:"id"`
-	ChatId     string `json:"chat_id"`
-	Type       string `json:"type"`
-	SenderId   string `json:"sender_id"`
-	Content    string `json:"content"`
-	CreateTime string `json:"create_time"`
+	Id       string `json:"id"`
+	ChatId   string `json:"chat_id"`
+	Type     string `json:"type"`
+	SenderId string `json:"sender_id"`
+	Content  string `json:"content"`
+	SendTime int64  `json:"send_time"`
 }
 
 type RespUser struct {
@@ -96,6 +88,6 @@ type RespConversation struct {
 	LastMessage  *RespConversationMessage `json:"last_message"`
 	UnreadCount  int                      `json:"unread_count"`
 	Name         string                   `json:"name"`
-	LastReadTime string                   `json:"last_read_time"`
+	LastReadTime int64                    `json:"last_read_time"`
 	CreateTime   string                   `json:"create_time"`
 }

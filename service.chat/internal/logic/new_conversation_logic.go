@@ -52,7 +52,7 @@ func (l *NewConversationLogic) NewConversation(req *types.CreateChannelRequest) 
 		OwnerId:      myUserId,
 		OppoId:       req.UserId,
 		Name:         "",
-		LastReadTime: time.Now(),
+		LastReadTime: time.Now().UnixMicro(),
 		CreateTime:   time.Now(),
 	})
 
@@ -63,7 +63,7 @@ func (l *NewConversationLogic) NewConversation(req *types.CreateChannelRequest) 
 		OwnerId:      req.UserId,
 		OppoId:       myUserId,
 		Name:         "",
-		LastReadTime: time.Now(),
+		LastReadTime: time.Now().UnixMicro(),
 		CreateTime:   time.Now(),
 	})
 

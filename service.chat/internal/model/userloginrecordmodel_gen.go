@@ -42,6 +42,7 @@ type (
 		DeviceName string    `db:"device_name"`
 		PushToken  string    `db:"push_token"`
 		Invalid    int64     `db:"invalid"`
+		EndTime    int64     `db:"end_time"`
 		CreateTime time.Time `db:"create_time"`
 	}
 )
@@ -74,14 +75,14 @@ func (m *defaultUserLoginRecordModel) FindOne(ctx context.Context, id string) (*
 }
 
 func (m *defaultUserLoginRecordModel) Insert(ctx context.Context, data *UserLoginRecord) (sql.Result, error) {
-	query := fmt.Sprintf("insert into %s (%s) values (?, ?, ?, ?, ?, ?)", m.table, userLoginRecordRowsExpectAutoSet)
-	ret, err := m.conn.ExecCtx(ctx, query, data.Id, data.UserId, data.Device, data.DeviceName, data.PushToken, data.Invalid)
+	query := fmt.Sprintf("insert into %s (%s) values (?, ?, ?, ?, ?, ?, ?)", m.table, userLoginRecordRowsExpectAutoSet)
+	ret, err := m.conn.ExecCtx(ctx, query, data.Id, data.UserId, data.Device, data.DeviceName, data.PushToken, data.Invalid, data.EndTime)
 	return ret, err
 }
 
 func (m *defaultUserLoginRecordModel) Update(ctx context.Context, data *UserLoginRecord) error {
 	query := fmt.Sprintf("update %s set %s where `id` = ?", m.table, userLoginRecordRowsWithPlaceHolder)
-	_, err := m.conn.ExecCtx(ctx, query, data.UserId, data.Device, data.DeviceName, data.PushToken, data.Invalid, data.Id)
+	_, err := m.conn.ExecCtx(ctx, query, data.UserId, data.Device, data.DeviceName, data.PushToken, data.Invalid, data.EndTime, data.Id)
 	return err
 }
 

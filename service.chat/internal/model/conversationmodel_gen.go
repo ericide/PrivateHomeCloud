@@ -42,7 +42,7 @@ type (
 		OwnerId      string    `db:"owner_id"`
 		OppoId       string    `db:"oppo_id"`
 		Name         string    `db:"name"`
-		LastReadTime time.Time `db:"last_read_time"`
+		LastReadTime int64     `db:"last_read_time"`
 		CreateTime   time.Time `db:"create_time"`
 	}
 )

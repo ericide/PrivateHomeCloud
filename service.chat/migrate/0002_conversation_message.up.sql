@@ -4,6 +4,6 @@ CREATE TABLE `chat`.`conversation_message`  (
         `type`   char(32)  NOT NULL,
         `sender_id` char(128)  NOT NULL,
         `content` text NOT NULL,
-        `create_time` timestamp(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
+        `send_time` bigint(20) NOT NULL DEFAULT 0,
         PRIMARY KEY (`id`) USING BTREE
 );
