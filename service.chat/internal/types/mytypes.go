@@ -1,6 +1,8 @@
 package types
 
-var FormatISOTime = "2006-01-02T15:04:05.999Z07:00"
+import "time"
+
+var FormatISOTime = time.RFC3339
 
 type LoginClaims struct {
 	UserId string `json:"user_id"`
