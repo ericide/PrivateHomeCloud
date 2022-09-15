@@ -1,6 +1,6 @@
 package types
 
-var FormatISOTime = "2006-01-02T15:04:05.000Z07:00"
+var FormatISOTime = "2006-01-02T15:04:05.999Z07:00"
 
 type LoginClaims struct {
 	UserId string `json:"user_id"`
