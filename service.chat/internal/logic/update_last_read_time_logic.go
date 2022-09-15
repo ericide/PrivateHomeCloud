@@ -65,7 +65,7 @@ func (l *UpdateLastReadTimeLogic) SendWSMessage(cstItem *model.Conversation) {
 		},
 		ChatId:   cstItem.ChatId,
 		UserId:   cstItem.OwnerId,
-		ReadTime: cstItem.LastReadTime,
+		ReadTime: cstItem.LastReadTime.Format(types.FormatISOTime),
 	}
 
 	pushString, _ := json.Marshal(pc)

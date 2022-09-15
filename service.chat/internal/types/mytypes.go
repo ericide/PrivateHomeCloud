@@ -1,8 +1,6 @@
 package types
 
-import (
-	"time"
-)
+var FormatISOTime = "2006-01-02T15:04:05.000Z07:00"
 
 type LoginClaims struct {
 	UserId string `json:"user_id"`
@@ -23,17 +21,17 @@ type WSPushBase struct {
 
 type WSPushMessage struct {
 	WSPushBase
-	ChatId            string    `json:"chat_id"`
-	MessageType       string    `json:"message_type"`
-	MessageId         string    `json:"message_id"`
-	MessageClientId   string    `json:"message_client_id"`
-	MessageContent    string    `json:"message_content"`
-	MessageSenderId   string    `json:"message_sender_id"`
-	MessageCreateTime time.Time `json:"message_create_time"`
+	ChatId            string `json:"chat_id"`
+	MessageType       string `json:"message_type"`
+	MessageId         string `json:"message_id"`
+	MessageClientId   string `json:"message_client_id"`
+	MessageContent    string `json:"message_content"`
+	MessageSenderId   string `json:"message_sender_id"`
+	MessageCreateTime string `json:"message_create_time"`
 }
 type WSUpdateReadTime struct {
 	WSPushBase
-	ChatId   string    `json:"chat_id"`
-	UserId   string    `json:"user_id"`
-	ReadTime time.Time `json:"read_time"`
+	ChatId   string `json:"chat_id"`
+	UserId   string `json:"user_id"`
+	ReadTime string `json:"read_time"`
 }

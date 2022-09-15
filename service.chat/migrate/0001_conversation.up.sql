@@ -5,7 +5,7 @@ CREATE TABLE `chat`.`conversation`  (
     `owner_id` char(128)  NOT NULL,
     `oppo_id` char(36) NOT NULL DEFAULT '',
     `name` char(255) NOT NULL DEFAULT '',
-    `last_read_time` timestamp  NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    `create_time` timestamp  NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `last_read_time` timestamp(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
+    `create_time` timestamp(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
     PRIMARY KEY (`id`) USING BTREE
 );

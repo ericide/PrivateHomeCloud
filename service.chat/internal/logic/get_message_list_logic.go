@@ -38,7 +38,7 @@ func (l *GetMessageListLogic) GetMessageList(req *types.MessagePageRequest) (res
 			Type:       x.Type,
 			SenderId:   x.SenderId,
 			Content:    x.Content,
-			CreateTime: x.CreateTime.String(),
+			CreateTime: x.CreateTime.Format(types.FormatISOTime),
 		})
 	}
 

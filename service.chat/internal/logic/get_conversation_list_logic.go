@@ -75,8 +75,8 @@ func (l *GetConversationListLogic) GetConversationList(req *types.NullRequest) (
 			LastMessage:  lastMessageWrap,
 			UnreadCount:  *unreadCount,
 			Name:         x.Name,
-			LastReadTime: x.LastReadTime.String(),
-			CreateTime:   x.CreateTime.String(),
+			LastReadTime: x.LastReadTime.Format(types.FormatISOTime),
+			CreateTime:   x.CreateTime.Format(types.FormatISOTime),
 		})
 	}
 

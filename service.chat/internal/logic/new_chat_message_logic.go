@@ -78,7 +78,7 @@ func (l *NewChatMessageLogic) SendWSMessage(plist *[]model.Conversation, msgClie
 		MessageType:       cmItem.Type,
 		MessageContent:    cmItem.Content,
 		MessageSenderId:   cmItem.SenderId,
-		MessageCreateTime: cmItem.CreateTime,
+		MessageCreateTime: cmItem.CreateTime.Format(types.FormatISOTime),
 	}
 
 	pushString, _ := json.Marshal(pc)
