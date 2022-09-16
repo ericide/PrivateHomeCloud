@@ -92,16 +92,23 @@ func (l *NewChatMessageLogic) SendWSMessage(plist *[]model.Conversation, msgClie
 }
 
 func (l *NewChatMessageLogic) SendPushNotificationToClient(plist *[]model.Conversation, cmItem model.ConversationMessage) {
+
+	sender, err := l.svcCtx.UserModel.FindOne(context.Background(), cmItem.SenderId)
+	//fmt.Println("user: ", user, userId, err)
+	if err != nil {
+		return
+	}
+
 	for _, person := range *plist {
 		if person.OwnerId == cmItem.SenderId {
 			continue
 		}
-		user, err := l.svcCtx.UserModel.FindOne(context.Background(), person.OwnerId)
-		//fmt.Println("user: ", user, userId, err)
+
+		count, err := l.svcCtx.ConversationMessageModel.CountAfterTime(context.Background(), person.ChatId, person.LastReadTime)
 		if err != nil {
 			return
 		}
-
+		
 		devices, err := l.svcCtx.UserLoginRecordModel.QueryByUser(person.OwnerId)
 		//fmt.Println("devices: ", devices)
 		if err != nil {
@@ -112,14 +119,14 @@ func (l *NewChatMessageLogic) SendPushNotificationToClient(plist *[]model.Conver
 			if item.PushToken != "" {
 				switch cmItem.Type {
 				case defines.MsgType_Text:
-					l.doPush(user.Name, cmItem.Content, item.PushToken)
+					l.doPush(sender.Name, cmItem.Content, item.PushToken, count)
 				}
 			}
 		}
 	}
 }
 
-func (l *NewChatMessageLogic) doPush(title string, content string, pushToken string) {
+func (l *NewChatMessageLogic) doPush(title string, content string, pushToken string, unread *int) {
 	logx.Info("SendPushToClient")
 
 	certificate, _ := tls.LoadX509KeyPair(l.svcCtx.Config.Push.CERT, l.svcCtx.Config.Push.KEY)
@@ -135,7 +142,7 @@ func (l *NewChatMessageLogic) doPush(title string, content string, pushToken str
 		fmt.Println(err)
 		return
 	}
-	badge := 100
+
 	resp, err := c.Send(pushToken,
 		apns.Payload{
 			APS: apns.APS{
@@ -143,7 +150,7 @@ func (l *NewChatMessageLogic) doPush(title string, content string, pushToken str
 					Title: title,
 					Body:  content,
 				},
-				Badge: &badge,
+				Badge: unread,
 			},
 		},
 		apns.WithExpiration(10),
