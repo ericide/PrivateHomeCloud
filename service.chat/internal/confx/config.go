@@ -15,7 +15,7 @@ import (
 )
 
 // DGTPrefix is a filter for environment variables
-const DGTPrefix = "DGT_"
+const ENVPrefix = "PHC_"
 
 var loaders = map[string]func([]byte, interface{}) error{
 	".yaml": conf.LoadConfigFromYamlBytes,
@@ -28,8 +28,8 @@ func LoadConfig(file string, v interface{}) error {
 
 	for _, e := range os.Environ() {
 		pair := strings.SplitN(e, "=", 2)
-		if strings.HasPrefix(pair[0], DGTPrefix) {
-			key := strings.TrimPrefix(pair[0], DGTPrefix)
+		if strings.HasPrefix(pair[0], ENVPrefix) {
+			key := strings.TrimPrefix(pair[0], ENVPrefix)
 			nkey := "@" + key + "@"
 			// fmt.Printf("pair0[%s] nkey[%s]\n", pair[0], nkey)
 			kv[nkey] = os.Getenv(pair[0])
