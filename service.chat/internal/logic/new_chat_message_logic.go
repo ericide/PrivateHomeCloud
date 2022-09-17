@@ -32,7 +32,7 @@ func NewNewChatMessageLogic(ctx context.Context, svcCtx *svc.ServiceContext) *Ne
 	}
 }
 
-func (l *NewChatMessageLogic) NewChatMessage(req *types.SendMessageRequest) (resp *types.Response, err error) {
+func (l *NewChatMessageLogic) NewChatMessage(req *types.SendMessageRequest) (resp *types.RespConversationMessage, err error) {
 	senderUserId, ok := l.ctx.Value("user_id").(string)
 	if !ok {
 		return nil, errors.New("user id not exist")
@@ -62,7 +62,15 @@ func (l *NewChatMessageLogic) NewChatMessage(req *types.SendMessageRequest) (res
 
 	l.SendWSMessage(plist, req.MessageClientId, cmItem)
 	go l.SendPushNotificationToClient(plist, cmItem)
-	return &types.Response{}, nil
+	return &types.RespConversationMessage{
+		Id:              cmItem.Id,
+		MessageClientId: req.MessageClientId,
+		ChatId:          cmItem.ChatId,
+		Type:            cmItem.Type,
+		SenderId:        cmItem.SenderId,
+		Content:         cmItem.Content,
+		SendTime:        cmItem.SendTime,
+	}, nil
 }
 
 func (l *NewChatMessageLogic) SendWSMessage(plist *[]model.Conversation, msgClientId string, cmItem model.ConversationMessage) {
@@ -108,7 +116,7 @@ func (l *NewChatMessageLogic) SendPushNotificationToClient(plist *[]model.Conver
 		if err != nil {
 			return
 		}
-		
+
 		devices, err := l.svcCtx.UserLoginRecordModel.QueryByUser(person.OwnerId)
 		//fmt.Println("devices: ", devices)
 		if err != nil {

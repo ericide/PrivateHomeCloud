@@ -65,12 +65,13 @@ type SendMessageRequest struct {
 }
 
 type RespConversationMessage struct {
-	Id       string `json:"id"`
-	ChatId   string `json:"chat_id"`
-	Type     string `json:"type"`
-	SenderId string `json:"sender_id"`
-	Content  string `json:"content"`
-	SendTime int64  `json:"send_time"`
+	Id              string `json:"id"`
+	MessageClientId string `json:"message_client_id,omitempty"`
+	ChatId          string `json:"chat_id"`
+	Type            string `json:"type"`
+	SenderId        string `json:"sender_id"`
+	Content         string `json:"content"`
+	SendTime        int64  `json:"send_time"`
 }
 
 type RespUser struct {
