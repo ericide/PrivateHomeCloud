@@ -3,11 +3,37 @@ package middleware
 import (
 	"fmt"
 	"github.com/gin-gonic/gin"
+	"github.com/golang-jwt/jwt"
+	"net/http"
 	"time"
 )
 
 func LoggerHandler() gin.HandlerFunc {
 	return func(c *gin.Context) {
+		jwtString := c.GetHeader("authorization")
+
+		token, err := jwt.Parse(jwtString, func(token *jwt.Token) (interface{}, error) {
+			return []byte("773d8b02-e3b5-11eb-ba80-0242ac222015"), nil
+		})
+
+		fmt.Println("token", err, token)
+
+		if err != nil {
+			c.JSON(http.StatusUnauthorized, gin.H{
+				"error": "not valid",
+			})
+			c.Abort()
+			return
+		}
+
+		if token.Valid != true {
+			c.JSON(http.StatusUnauthorized, gin.H{
+				"error": "not valid",
+			})
+			c.Abort()
+			return
+		}
+
 		t := time.Now()
 		c.Next()
 		latency := time.Since(t)
