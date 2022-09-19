@@ -1,7 +1,6 @@
 package logic
 
 import (
-	"fmt"
 	"github.com/gin-gonic/gin"
 	"log"
 	"path/filepath"
@@ -13,14 +12,14 @@ type NewFileLogic struct {
 	svcCtx *svc.ServiceContext
 }
 
-func NewNewFileLogic( svcCtx *svc.ServiceContext) *GetFileListLogic {
-	return &GetFileListLogic{
+func NewNewFileLogic(svcCtx *svc.ServiceContext) *NewFileLogic {
+	return &NewFileLogic{
 		svcCtx: svcCtx,
 	}
 }
 
 func (l *NewFileLogic) Do(context *gin.Context) (resp interface{}, err error) {
-
+	log.Printf("NewFileLogic\n")
 	file, err := context.FormFile("file")
 	if err != nil {
 		return nil, err
@@ -31,7 +30,7 @@ func (l *NewFileLogic) Do(context *gin.Context) (resp interface{}, err error) {
 
 	finalPath := filepath.Join(l.svcCtx.Config.PhysicalPath, basePath, file.Filename)
 
-	fmt.Println(l.svcCtx.Config.PhysicalPath, basePath, file.Filename, finalPath)
+	log.Println(l.svcCtx.Config.PhysicalPath, basePath, file.Filename, finalPath)
 
 	err = context.SaveUploadedFile(file, finalPath)
 
