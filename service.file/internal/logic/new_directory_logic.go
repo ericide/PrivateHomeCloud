@@ -14,16 +14,23 @@ type NewDirectoryLogic struct {
 	svcCtx *svc.ServiceContext
 }
 
-func NewNewDirectoryLogic( svcCtx *svc.ServiceContext) *GetFileListLogic {
-	return &GetFileListLogic{
+func NewNewDirectoryLogic(svcCtx *svc.ServiceContext) *NewDirectoryLogic {
+	return &NewDirectoryLogic{
 		svcCtx: svcCtx,
 	}
 }
 
 func (l *NewDirectoryLogic) Do(context *gin.Context) (resp interface{}, err error) {
 
-	basePath := context.Request.FormValue("base_path")
-	fileName := context.Request.FormValue("file_name")
+	log.Println("NewDirectoryLogic")
+
+	var reqCreateDirectory types.ReqCreateDirectory
+	context.BindJSON(&reqCreateDirectory)
+
+	basePath := reqCreateDirectory.BasePath
+	fileName := reqCreateDirectory.Name
+
+	log.Println("create info", basePath, fileName)
 
 	finalPath := filepath.Join(l.svcCtx.Config.PhysicalPath, basePath, fileName)
 
@@ -40,7 +47,7 @@ func (l *NewDirectoryLogic) Do(context *gin.Context) (resp interface{}, err erro
 	}, nil
 }
 
-func (l *NewDirectoryLogic) createDir(path string)  error {
+func (l *NewDirectoryLogic) createDir(path string) error {
 	_exist, _err := l.hasDir(path)
 	if _err != nil {
 		log.Printf("获取文件夹异常 -> %v\n", _err)
