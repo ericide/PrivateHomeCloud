@@ -13,6 +13,11 @@ type RespFile struct {
 	IsDir   bool   `json:"is_dir"`
 }
 
+type ReqCreateDirectory struct {
+	Name     string `json:"name"`
+	BasePath string `json:"base_path"`
+}
+
 var (
 	// ErrNotFound is an alias of sqlx.ErrNotFound.
 	ErrNotFound = errors.New("Not FOUND")
