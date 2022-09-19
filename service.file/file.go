@@ -7,8 +7,8 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
-	"service.file/middleware"
-	"service.file/types"
+	"service.file/internal/middleware"
+	"service.file/internal/types"
 	"time"
 )
 
