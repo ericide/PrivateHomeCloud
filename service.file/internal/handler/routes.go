@@ -7,10 +7,10 @@ import (
 	"service.file/internal/svc"
 )
 
-func RegisterHandlers(server *gin.Engine , serverCtx *svc.ServiceContext) {
+func RegisterHandlers(server *gin.Engine, serverCtx *svc.ServiceContext) {
 	server.Use(middleware.LoggerHandler())
 
-	server.GET("filelist/*path", createNormalHandler(logic.NewGetFileListLogic(serverCtx)) )
+	server.GET("filelist/*path", createNormalHandler(logic.NewGetFileListLogic(serverCtx)))
 
 	server.POST("directory", createNormalHandler(logic.NewNewDirectoryLogic(serverCtx)))
 
@@ -22,4 +22,3 @@ func RegisterHandlers(server *gin.Engine , serverCtx *svc.ServiceContext) {
 type StandardHandler interface {
 	Do(context *gin.Context) (interface{}, error)
 }
-
