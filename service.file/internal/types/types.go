@@ -1,5 +1,7 @@
 package types
 
+import "errors"
+
 type DataResponse struct {
 	Data any `json:"data"`
 }
@@ -10,3 +12,8 @@ type RespFile struct {
 	ModTime string `json:"mod_time"`
 	IsDir   bool   `json:"is_dir"`
 }
+
+var (
+	// ErrNotFound is an alias of sqlx.ErrNotFound.
+	ErrNotFound = errors.New("Not FOUND")
+)
