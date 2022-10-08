@@ -57,14 +57,7 @@ func (l *GetConversationListLogic) GetConversationList(req *types.NullRequest) (
 		lastMessage, _ := l.svcCtx.ConversationMessageModel.LastMessage(l.ctx, x.ChatId)
 		var lastMessageWrap *types.RespConversationMessage = nil
 		if lastMessage != nil {
-			lastMessageWrap = &types.RespConversationMessage{
-				Id:       lastMessage.Id,
-				ChatId:   lastMessage.ChatId,
-				Type:     lastMessage.Type,
-				SenderId: lastMessage.SenderId,
-				Content:  lastMessage.Content,
-				SendTime: lastMessage.SendTime,
-			}
+			lastMessageWrap = lastMessage.ToRespConversationMessage()
 		}
 
 		list2 = append(list2, types.RespConversation{

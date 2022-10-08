@@ -60,33 +60,22 @@ func (l *NewChatMessageLogic) NewChatMessage(req *types.SendMessageRequest) (res
 
 	l.svcCtx.ConversationMessageModel.Insert(l.ctx, &cmItem)
 
-	l.SendWSMessage(plist, req.MessageClientId, cmItem)
+	message := cmItem.ToRespConversationMessage()
+	message.MessageClientId = req.MessageClientId
+
+	l.SendWSMessage(plist, *message)
 	go l.SendPushNotificationToClient(plist, cmItem)
-	return &types.RespConversationMessage{
-		Id:              cmItem.Id,
-		MessageClientId: req.MessageClientId,
-		ChatId:          cmItem.ChatId,
-		Type:            cmItem.Type,
-		SenderId:        cmItem.SenderId,
-		Content:         cmItem.Content,
-		SendTime:        cmItem.SendTime,
-	}, nil
+	return message, nil
 }
 
-func (l *NewChatMessageLogic) SendWSMessage(plist *[]model.Conversation, msgClientId string, cmItem model.ConversationMessage) {
+func (l *NewChatMessageLogic) SendWSMessage(plist *[]model.Conversation, message types.RespConversationMessage) {
 
 	pc := types.WSPushMessage{
 		WSPushBase: types.WSPushBase{
 			Type:    defines.WSType_Message,
 			SubType: defines.WSSubType_Message,
 		},
-		ChatId:          cmItem.ChatId,
-		MessageId:       cmItem.Id,
-		MessageClientId: msgClientId,
-		MessageType:     cmItem.Type,
-		MessageContent:  cmItem.Content,
-		MessageSenderId: cmItem.SenderId,
-		MessageSendTime: cmItem.SendTime,
+		Message: message,
 	}
 
 	pushString, _ := json.Marshal(pc)

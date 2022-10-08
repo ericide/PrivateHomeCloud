@@ -2,7 +2,6 @@ package logic
 
 import (
 	"context"
-
 	"service.chat/internal/svc"
 	"service.chat/internal/types"
 
@@ -32,14 +31,7 @@ func (l *GetMessageListLogic) GetMessageList(req *types.MessagePageRequest) (res
 
 	var list2 []types.RespConversationMessage
 	for _, x := range list {
-		list2 = append(list2, types.RespConversationMessage{
-			Id:       x.Id,
-			ChatId:   x.ChatId,
-			Type:     x.Type,
-			SenderId: x.SenderId,
-			Content:  x.Content,
-			SendTime: x.SendTime,
-		})
+		list2 = append(list2, *x.ToRespConversationMessage())
 	}
 
 	return &types.NormalListResponse{

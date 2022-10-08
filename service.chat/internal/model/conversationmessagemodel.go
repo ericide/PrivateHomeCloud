@@ -2,9 +2,12 @@ package model
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"github.com/zeromicro/go-zero/core/stores/sqlc"
 	"github.com/zeromicro/go-zero/core/stores/sqlx"
+	"service.chat/internal/defines"
+	"service.chat/internal/types"
 )
 
 var _ ConversationMessageModel = (*customConversationMessageModel)(nil)
@@ -70,5 +73,26 @@ func (m *customConversationMessageModel) LastMessage(ctx context.Context, chatId
 		return nil, ErrNotFound
 	default:
 		return nil, err
+	}
+}
+
+func (cm *ConversationMessage) ToRespConversationMessage() *types.RespConversationMessage {
+	var content types.RespConversationMessageContent
+	if cm.Type == defines.MsgType_Text {
+		content = types.RespConversationMessageContent{
+			Text: cm.Content,
+		}
+	}
+	if cm.Type == defines.MsgType_Img {
+		json.Unmarshal([]byte(cm.Content), &content)
+	}
+
+	return &types.RespConversationMessage{
+		Id:       cm.Id,
+		ChatId:   cm.ChatId,
+		Type:     cm.Type,
+		SenderId: cm.SenderId,
+		Content:  content,
+		SendTime: cm.SendTime,
 	}
 }
