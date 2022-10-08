@@ -7,4 +7,5 @@ const (
 	WSSubType_UpdateTime = "UPDATE_READ_TIME"
 
 	MsgType_Text = "text"
+	MsgType_Img  = "image"
 )
