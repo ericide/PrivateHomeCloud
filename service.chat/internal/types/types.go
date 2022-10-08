@@ -45,6 +45,10 @@ type LoginResponse struct {
 	RefreshAfter int64  `json:"refresh_after"`
 }
 
+type GetProfileReq struct {
+	Uid string `path:"uid"`
+}
+
 type CreateChannelRequest struct {
 	UserId string `json:"user_id"`
 }
@@ -65,13 +69,20 @@ type SendMessageRequest struct {
 }
 
 type RespConversationMessage struct {
-	Id              string `json:"id"`
-	MessageClientId string `json:"message_client_id,omitempty"`
-	ChatId          string `json:"chat_id"`
-	Type            string `json:"type"`
-	SenderId        string `json:"sender_id"`
-	Content         string `json:"content"`
-	SendTime        int64  `json:"send_time"`
+	Id              string                         `json:"id"`
+	MessageClientId string                         `json:"message_client_id,omitempty"`
+	ChatId          string                         `json:"chat_id"`
+	Type            string                         `json:"type"`
+	SenderId        string                         `json:"sender_id"`
+	Content         RespConversationMessageContent `json:"content"`
+	SendTime        int64                          `json:"send_time"`
+}
+
+type RespConversationMessageContent struct {
+	Text    string `json:"text,omitempty"`
+	Width   int    `json:"width"`
+	Height  int    `json:"height"`
+	FileUri string `json:"file_uri"`
 }
 
 type RespUser struct {

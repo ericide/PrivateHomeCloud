@@ -41,6 +41,10 @@ type (
 		RefreshAfter int64  `json:"refresh_after"`
 	}
 
+	GetProfileReq {
+		Uid string `path:"uid"`
+	}
+
 	CreateChannelRequest {
 		UserId string `json:"user_id"`
 	}
@@ -61,13 +65,20 @@ type (
 	}
 
 	RespConversationMessage {
-		Id              string `json:"id"`
-		MessageClientId string `json:"message_client_id,omitempty"`
-		ChatId          string `json:"chat_id"`
-		Type            string `json:"type"`
-		SenderId        string `json:"sender_id"`
-		Content         string `json:"content"`
-		SendTime        int64  `json:"send_time"`
+		Id              string                         `json:"id"`
+		MessageClientId string                         `json:"message_client_id,omitempty"`
+		ChatId          string                         `json:"chat_id"`
+		Type            string                         `json:"type"`
+		SenderId        string                         `json:"sender_id"`
+		Content         RespConversationMessageContent `json:"content"`
+		SendTime        int64                          `json:"send_time"`
+	}
+
+	RespConversationMessageContent {
+		Text    string `json:"text,omitempty"`
+		Width   int    `json:"width"`
+		Height  int    `json:"height"`
+		FileUri string `json:"file_uri"`
 	}
 
 	RespUser {
@@ -103,6 +114,9 @@ service chat-api {
 service chat-api {
 	@handler updateToken
 	patch /pushtoken (UpdatePushTokenRequest) returns (Response)
+	
+	@handler getProfile
+	patch /profile/:uid (GetProfileReq) returns (RespUser)
 	
 	@handler getMessageList
 	get /messages/:chat_id (MessagePageRequest) returns (NormalListResponse)
