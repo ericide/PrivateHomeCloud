@@ -30,7 +30,7 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 					Handler: updateTokenHandler(serverCtx),
 				},
 				{
-					Method:  http.MethodPatch,
+					Method:  http.MethodGet,
 					Path:    "/user/profile/:uid",
 					Handler: getProfileHandler(serverCtx),
 				},
