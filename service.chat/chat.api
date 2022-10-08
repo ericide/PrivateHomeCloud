@@ -116,7 +116,7 @@ service chat-api {
 	patch /pushtoken (UpdatePushTokenRequest) returns (Response)
 	
 	@handler getProfile
-	patch /profile/:uid (GetProfileReq) returns (RespUser)
+	patch /user/profile/:uid (GetProfileReq) returns (RespUser)
 	
 	@handler getMessageList
 	get /messages/:chat_id (MessagePageRequest) returns (NormalListResponse)

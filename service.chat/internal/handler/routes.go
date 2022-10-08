@@ -31,7 +31,7 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 				},
 				{
 					Method:  http.MethodPatch,
-					Path:    "/profile/:uid",
+					Path:    "/user/profile/:uid",
 					Handler: getProfileHandler(serverCtx),
 				},
 				{
