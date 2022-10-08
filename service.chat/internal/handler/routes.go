@@ -30,6 +30,11 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 					Handler: updateTokenHandler(serverCtx),
 				},
 				{
+					Method:  http.MethodPatch,
+					Path:    "/profile/:uid",
+					Handler: getProfileHandler(serverCtx),
+				},
+				{
 					Method:  http.MethodGet,
 					Path:    "/messages/:chat_id",
 					Handler: getMessageListHandler(serverCtx),
