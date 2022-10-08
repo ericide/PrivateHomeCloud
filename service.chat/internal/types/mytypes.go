@@ -19,13 +19,7 @@ type WSPushBase struct {
 
 type WSPushMessage struct {
 	WSPushBase
-	ChatId          string `json:"chat_id"`
-	MessageType     string `json:"message_type"`
-	MessageId       string `json:"message_id"`
-	MessageClientId string `json:"message_client_id"`
-	MessageContent  string `json:"message_content"`
-	MessageSenderId string `json:"message_sender_id"`
-	MessageSendTime int64  `json:"message_send_time"`
+	Message RespConversationMessage `json:"message"`
 }
 type WSUpdateReadTime struct {
 	WSPushBase
