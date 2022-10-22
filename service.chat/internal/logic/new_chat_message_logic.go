@@ -116,7 +116,7 @@ func (l *NewChatMessageLogic) SendPushNotificationToClient(plist *[]model.Conver
 			if item.PushToken != "" {
 				switch cmItem.Type {
 				case defines.MsgType_Text:
-					l.doPush(sender.Name, cmItem.Content, item.PushToken, count)
+					l.doPush(sender.Name, "New message", item.PushToken, count)
 				}
 			}
 		}
