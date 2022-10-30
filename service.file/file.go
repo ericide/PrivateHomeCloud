@@ -2,26 +2,38 @@ package main
 
 import (
 	"fmt"
-	"github.com/gin-gonic/gin"
+	"github.com/hacdias/webdav/v4/lib"
+	"go.uber.org/zap"
+	"golang.org/x/net/webdav"
 	"log"
+	"net"
+	"net/http"
 	"os"
 	"service.file/internal/config"
-	"service.file/internal/handler"
-	"service.file/internal/svc"
 )
 
 func main() {
-	engine := gin.Default()
 
-	var c = config.Config{
-		Port: 8001,
+	var cfg = &config.Config{
+		Port:         8001,
 		AccessToken:  os.Getenv("ACCESS_SECRET"),
 		PhysicalPath: os.Getenv("FILE_ROOT_PATH"),
+		Webdav: &webdav.Handler{
+			Prefix: "/",
+			FileSystem: lib.WebDavDir{
+				Dir:     webdav.Dir("/Users/wu/Downloads/fusehfs-master"),
+				NoSniff: false,
+			},
+			LockSystem: webdav.NewMemLS(),
+		},
 	}
-	ctx := svc.NewServiceContext(c)
 
-	handler.RegisterHandlers(engine, ctx)
+	listener, err := net.Listen("tcp", fmt.Sprintf(":%d", cfg.Port))
+	if err != nil {
+		log.Fatal(err)
+	}
+	if err := http.Serve(listener, cfg); err != nil {
+		log.Fatal("shutting server", zap.Error(err))
+	}
 
-	engine.Run( fmt.Sprintf(":%d", c.Port))
-	log.Printf("server run : %d", c.Port)
 }
