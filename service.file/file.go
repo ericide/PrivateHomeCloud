@@ -21,7 +21,7 @@ func main() {
 		Webdav: &webdav.Handler{
 			Prefix: "/",
 			FileSystem: lib.WebDavDir{
-				Dir:     webdav.Dir("/Users/wu/Downloads/fusehfs-master"),
+				Dir:     webdav.Dir(os.Getenv("FILE_ROOT_PATH")),
 				NoSniff: false,
 			},
 			LockSystem: webdav.NewMemLS(),
