@@ -2,7 +2,6 @@ package config
 
 import (
 	"fmt"
-	"io"
 	"io/ioutil"
 	"net/http"
 )
@@ -15,15 +14,18 @@ type Config struct {
 func (c *Config) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	fmt.Println(r.RequestURI)
-	req, _ := http.NewRequest(r.Method, "http://192.168.124.65:8001"+r.RequestURI, r.Body)
+
+	client := http.Client{}
+
+	req, _ := http.NewRequest(r.Method, "http://192.168.124.65"+r.RequestURI, r.Body)
 	for k, v := range r.Header {
 		for _, vv := range v {
 			req.Header.Add(k, vv)
 		}
 	}
-	req.Header.Add("authorization", "bbbbb")
+	req.Header.Add("authorization", "")
 
-	resp, err := http.DefaultClient.Do(req)
+	resp, err := client.Do(req)
 
 	if err != nil {
 		print(err.Error())
@@ -36,7 +38,6 @@ func (c *Config) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 	w.WriteHeader(resp.StatusCode)
-	io.Copy(w, resp.Body)
 	result, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		fmt.Println("error:", err)
