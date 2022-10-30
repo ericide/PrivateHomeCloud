@@ -15,7 +15,7 @@ type Config struct {
 func (c *Config) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	fmt.Println(r.RequestURI)
-	req, _ := http.NewRequest(r.Method, "http://localhost:8001"+r.RequestURI, r.Body)
+	req, _ := http.NewRequest(r.Method, "http://192.168.124.65:8001"+r.RequestURI, r.Body)
 	for k, v := range r.Header {
 		for _, vv := range v {
 			req.Header.Add(k, vv)
