@@ -21,8 +21,8 @@ func (c *Config) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return []byte(c.AccessToken), nil
 	})
 	if err != nil {
-		w.WriteHeader(http.StatusUnauthorized)
-		return
+		//w.WriteHeader(http.StatusUnauthorized)
+		//return
 	}
 
 	//fmt.Println(token, r.RequestURI, r.Method, r.Header.Get("Depth"))
