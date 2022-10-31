@@ -19,7 +19,7 @@ func main() {
 		AccessToken:  os.Getenv("ACCESS_SECRET"),
 		PhysicalPath: os.Getenv("FILE_ROOT_PATH"),
 		Webdav: &webdav.Handler{
-			Prefix: "/tesla",
+			Prefix: os.Getenv("PATH_PREFIX"),
 			FileSystem: lib.WebDavDir{
 				Dir:     webdav.Dir(os.Getenv("FILE_ROOT_PATH")),
 				NoSniff: false,
