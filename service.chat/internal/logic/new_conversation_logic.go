@@ -34,6 +34,10 @@ func (l *NewConversationLogic) NewConversation(req *types.CreateChannelRequest) 
 		return nil, errors.New("user id not exist")
 	}
 
+	if myUserId == req.UserId {
+		return nil, errors.New("you can`t chat to yourself")
+	}
+
 	chatId := l.get1To1ChatId(myUserId, req.UserId)
 
 	list, err := l.svcCtx.ConversationModel.QueryByChatId(l.ctx, chatId)
