@@ -7,5 +7,7 @@ Auth:
 Mysql:
   DataSource: @MYSQL_SERVICE@/chat?charset=utf8mb4&parseTime=true
 Push:
-  CERT: @PUSH_CERT_PATH@
-  KEY: @PUSH_KEY_PATH@
+  IOS:
+    CERT: @PUSH_CERT_PATH@
+    KEY: @PUSH_KEY_PATH@
+    BundleId: @BUNDLE_ID@

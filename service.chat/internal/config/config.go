@@ -12,7 +12,10 @@ type Config struct {
 		AccessExpire int64
 	}
 	Push struct {
-		CERT string
-		KEY  string
+		IOS struct {
+			CERT     string
+			KEY      string
+			BundleId string
+		}
 	}
 }

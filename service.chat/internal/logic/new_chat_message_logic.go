@@ -126,11 +126,11 @@ func (l *NewChatMessageLogic) SendPushNotificationToClient(plist *[]model.Conver
 func (l *NewChatMessageLogic) doPush(title string, content string, pushToken string, unread *int) {
 	logx.Info("SendPushToClient")
 
-	certificate, _ := tls.LoadX509KeyPair(l.svcCtx.Config.Push.CERT, l.svcCtx.Config.Push.KEY)
+	certificate, _ := tls.LoadX509KeyPair(l.svcCtx.Config.Push.IOS.CERT, l.svcCtx.Config.Push.IOS.KEY)
 	//l.svcCtx.Config.Push.CERT
 	c, err := apns.NewClient(
 		apns.WithCertificate(certificate),
-		apns.WithBundleID("com.cabital.cabital.debug.h5.container"),
+		apns.WithBundleID(l.svcCtx.Config.Push.IOS.BundleId),
 		apns.WithMaxIdleConnections(10),
 		apns.WithTimeout(10*time.Second),
 		apns.WithEndpoint("https://api.sandbox.push.apple.com:443"),
