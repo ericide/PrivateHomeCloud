@@ -82,9 +82,12 @@ func (cm *ConversationMessage) ToRespConversationMessage() *types.RespConversati
 		content = types.RespConversationMessageContent{
 			Text: cm.Content,
 		}
-	}
-	if cm.Type == defines.MsgType_Img {
+	} else if cm.Type == defines.MsgType_Img {
 		json.Unmarshal([]byte(cm.Content), &content)
+	} else {
+		content = types.RespConversationMessageContent{
+			Text: cm.Content,
+		}
 	}
 
 	return &types.RespConversationMessage{

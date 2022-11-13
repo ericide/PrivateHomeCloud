@@ -35,3 +35,10 @@ type WSBaseReq struct {
 type WSAuthReq struct {
 	Token string `json:"token"`
 }
+
+type WSWebRtcMsg struct {
+	Type    string `json:"type"`
+	SubType string `json:"sub_type"`
+	OppoId  string `json:"oppo_id"`
+	Content string `json:"content"`
+}

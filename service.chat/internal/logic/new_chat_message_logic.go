@@ -126,6 +126,10 @@ func (l *NewChatMessageLogic) SendPushNotificationToClient(plist *[]model.Conver
 func (l *NewChatMessageLogic) doPush(title string, content string, pushToken string, unread *int) {
 	logx.Info("SendPushToClient")
 
+	if l.svcCtx.Config.Push.IOS.CERT == "" {
+		return
+	}
+
 	certificate, _ := tls.LoadX509KeyPair(l.svcCtx.Config.Push.IOS.CERT, l.svcCtx.Config.Push.IOS.KEY)
 	//l.svcCtx.Config.Push.CERT
 	c, err := apns.NewClient(

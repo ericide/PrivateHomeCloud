@@ -2,6 +2,7 @@ package ws
 
 import (
 	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
 	"service.chat/internal/logic"
@@ -63,49 +64,75 @@ func (c *Client) readPump() {
 		c.hub.unregister <- c
 		c.conn.Close()
 	}()
-	c.conn.SetReadLimit(maxMessageSize)
+	c.conn.SetReadLimit(50240)
 	c.conn.SetReadDeadline(time.Now().Add(pongWait))
 	c.conn.SetPongHandler(func(string) error { c.conn.SetReadDeadline(time.Now().Add(pongWait)); return nil })
 	for {
-		_, message, err := c.conn.ReadMessage()
+		le, message, err := c.conn.ReadMessage()
+
+		fmt.Println("+++", le, len(message), err)
 		if err != nil {
+			fmt.Println(le, err)
 			if websocket.IsUnexpectedCloseError(err, websocket.CloseGoingAway, websocket.CloseAbnormalClosure) {
 				log.Printf("error: %v", err)
 			}
 			break
 		}
-
 		typeReq := types.WSBaseReq{}
 		err = json.Unmarshal(message, &typeReq)
 		if err != nil {
 			log.Println("解码失败", err)
 			continue
 		}
-		switch typeReq.Type {
-		case "AUTH":
+
+		if typeReq.Type == "AUTH" {
 			authReq := types.WSAuthReq{}
 			err = json.Unmarshal(message, &authReq)
 			if err != nil {
 				log.Println("解码失败", err)
-				break
+				continue
 			}
 
 			data, err := logic.JwtAuth(c.svc, authReq.Token)
 			if err != nil {
 				log.Println("err", err)
-				break
+				continue
 			}
 
 			err = logic.JwtClaimAuth(c.svc, data)
 			if err != nil {
 				log.Println("err", err)
-				break
+				continue
 			}
 			c.JwtId = data.JwtId
 			c.UserId = data.UserId
 
 			c.hub.register <- c
-			break
+			continue
+		}
+		if typeReq.Type == "WEBRTC" {
+			msg := types.WSWebRtcMsg{}
+			err = json.Unmarshal(message, &msg)
+			if err != nil {
+				log.Println("解码失败", err)
+				continue
+			}
+
+			oppoId := msg.OppoId
+			msg.OppoId = c.UserId
+
+			//datas, err := json.Marshal(msg)
+			//if err != nil {
+			//	log.Println("解码失败", err)
+			//	continue
+			//}
+
+			c.svc.ChannelChat <- &types.ChannelMessage{
+				UserId:  oppoId,
+				JwtId:   "",
+				Content: message,
+			}
+
 		}
 
 		//message = bytes.TrimSpace(bytes.Replace(message, newline, space, -1))

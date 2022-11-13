@@ -1,6 +1,7 @@
 package ws
 
 import (
+	"github.com/gorilla/websocket"
 	"service.chat/internal/svc"
 )
 
@@ -55,12 +56,13 @@ func (h *Hub) Run() {
 		case message := <-h.svcCtx.ChannelChat:
 			for client := range h.clients {
 				if (message.JwtId != "" && message.JwtId == client.JwtId) || (message.UserId == client.UserId) {
-					select {
-					case client.send <- message.Content:
-					default:
-						close(client.send)
-						delete(h.clients, client)
-					}
+					client.conn.WriteMessage(websocket.TextMessage, message.Content)
+					//select {
+					//case client.send <- message.Content:
+					//default:
+					//	close(client.send)
+					//	delete(h.clients, client)
+					//}
 				}
 			}
 		}
