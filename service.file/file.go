@@ -13,7 +13,7 @@ import (
 )
 
 func main() {
-
+	//PATH_PREFIX must like /ddd/
 	var cfg = &config.Config{
 		Port:         8002,
 		AccessToken:  os.Getenv("ACCESS_SECRET"),
