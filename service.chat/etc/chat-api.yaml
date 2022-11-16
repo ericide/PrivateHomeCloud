@@ -1,6 +1,6 @@
 Name: chat-api
 Host: 0.0.0.0
-Port: 8888
+Port: 9888
 Auth:
   AccessSecret: @ACCESS_SECRET@
   AccessExpire: 36000000
