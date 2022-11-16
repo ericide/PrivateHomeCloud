@@ -21,7 +21,7 @@ const (
 	pongWait = 60 * time.Second
 
 	// Send pings to peer with this period. Must be less than pongWait.
-	pingPeriod = (pongWait * 9) / 10
+	pingPeriod = (pongWait * 3) / 10
 
 	// Maximum message size allowed from peer.
 	maxMessageSize = 512
@@ -66,7 +66,10 @@ func (c *Client) readPump() {
 	}()
 	c.conn.SetReadLimit(50240)
 	c.conn.SetReadDeadline(time.Now().Add(pongWait))
-	c.conn.SetPongHandler(func(string) error { c.conn.SetReadDeadline(time.Now().Add(pongWait)); return nil })
+	c.conn.SetPongHandler(func(appData string) error {
+		c.conn.SetReadDeadline(time.Now().Add(pongWait))
+		return nil
+	})
 	for {
 		le, message, err := c.conn.ReadMessage()
 
